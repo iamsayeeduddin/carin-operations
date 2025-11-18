@@ -1,13 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginCard() {
+  const navigate = useNavigate();
+  const [error, setError] = useState(null);
   const validationSchema = Yup.object({
     email: Yup.string().required("Required"),
-    password: Yup.string().min(6, "Min 6 characters").required("Required"),
+    password: Yup.string().min(6, "Min 4 characters").required("Required"),
   });
+
+  const handleSubmit = (values) => {
+    if (values.email === "admin" && values.password === "admin1234") {
+      navigate("/dashboard");
+    } else {
+      setError("Invalid credentials");
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
@@ -34,7 +45,7 @@ export default function LoginCard() {
         <Formik
           initialValues={{ email: "", password: "", remember: false }}
           validationSchema={validationSchema}
-          onSubmit={(values) => console.log(values)}
+          onSubmit={(values) => handleSubmit(values)}
         >
           {() => (
             <Form>
@@ -106,6 +117,16 @@ export default function LoginCard() {
               >
                 Login
               </motion.button>
+              {error ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="bg-red-200 shadow-xl rounded-2xl p-6 sm:p-8 w-full max-w-md border border-gray-200"
+                >
+                  <p className="text-red-500 text-sm mt-2">{error}</p>
+                </motion.div>
+              ) : null}
             </Form>
           )}
         </Formik>
